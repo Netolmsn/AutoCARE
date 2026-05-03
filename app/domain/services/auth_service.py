@@ -34,7 +34,6 @@ class AuthService:
     
     @staticmethod
     def get_password_hash(password: str) -> str:
-        # Validação de segurança para o limite do Bcrypt
         if len(password.encode('utf-8')) > 72:
             raise HTTPException(
                 status_code=400, 
@@ -53,6 +52,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         email: str = payload.get("sub")
         user_type: str = payload.get("user_type")
         vin: str = payload.get("vin")
+        # --- A PEÇA QUE FALTA ESTÁ AQUI ---
+        workshop_name: str = payload.get("workshop_name") 
         
         if email is None:
             raise credentials_exception
@@ -60,7 +61,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         return {
             "email": email, 
             "user_type": user_type,
-            "vin": vin
+            "vin": vin,
+            "workshop_name": workshop_name
         }
+    except JWTError:
+        raise credentials_exception
+    
     except JWTError:
         raise credentials_exception
